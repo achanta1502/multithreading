@@ -1,5 +1,9 @@
 package test;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 class ThreadTest extends Thread {
 
     public void run() {
@@ -109,31 +113,104 @@ class App {
 //        t1.join();
 //        t2.join();
 //
-//        Avaned example of wait and notify
-        AdvWaitNotify wn = new AdvWaitNotify();
-        Thread t1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    wn.produce();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+//        Advaned example of wait and notify
+//        AdvWaitNotify wn = new AdvWaitNotify();
+//        Thread t1 = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    wn.produce();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        Thread t2 = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    wn.consume();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        t1.start();
+//        t2.start();
+//        t1.join();
+//        t2.join();
+//
+//        Renetrant locks
+//        Runner runner = new Runner();
+//        Thread t1 = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    runner.firstThread();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        Thread t2 = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    runner.secondThread();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        t1.start();
+//        t2.start();
+//        t1.join();
+//        t2.join();
+//        runner.finished();
+//        reentrant locks with examples
+//        AccountRunner runner = new AccountRunner();
+//        Thread t1 = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    runner.firstThread();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        Thread t2 = new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    runner.secondThread();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
+//        t1.start();
+//        t2.start();
+//        t1.join();
+//        t2.join();
+//        runner.finished();
+//
+//        Semaphores
+        ExecutorService executor = Executors.newCachedThreadPool();
+        for(int i = 0; i < 200; i++) {
+            executor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Connection.getInstance().connect();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                 }
-            }
-        });
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    wn.consume();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        t1.start();
-        t2.start();
-        t1.join();
-        t2.join();
+            });
+        }
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.DAYS);
     }
 }
