@@ -1,8 +1,8 @@
 package test;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
+import java.util.Random;
+import java.util.concurrent.*;
 
 class ThreadTest extends Thread {
 
@@ -196,21 +196,67 @@ class App {
 //        runner.finished();
 //
 //        Semaphores
+//        ExecutorService executor = Executors.newCachedThreadPool();
+//        for(int i = 0; i < 200; i++) {
+//            executor.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        Connection.getInstance().connect();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                }
+//            });
+//        }
+//        executor.shutdown();
+//        executor.awaitTermination(1, TimeUnit.DAYS);
+//
+//        Callable
+//        ExecutorService executor = Executors.newCachedThreadPool();
+//        Future<Integer> future = executor.submit(new Callable<Integer>() {
+//            public Integer call() throws Exception {
+//                Random random = new Random();
+//                int duration = random.nextInt(4000);
+//                if(duration > 2000) {
+//                    throw new IOException("Sleepin too long...");
+//                }
+//                System.out.println("started...");
+//                Sleep.sleep(duration);
+//                System.out.println("Finished");
+//                return duration;
+//            }
+//        });
+//        executor.shutdown();
+//        executor.awaitTermination(1, TimeUnit.DAYS);
+//        try {
+//            System.out.println("Result is: " + future.get());
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        Interruping Threads
+    System.out.println("starting");
         ExecutorService executor = Executors.newCachedThreadPool();
-        for(int i = 0; i < 200; i++) {
-            executor.submit(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        Connection.getInstance().connect();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
+        Future<?> future = executor.submit(new Callable<Void>() {
+        @Override
+        public Void call() throws Exception{
+            Random random = new Random();
+            for(int i = 0; i < 1E8; i++) {
+                if(Thread.currentThread().isInterrupted()) {
+                    System.out.println("interrupted");
+                    break;
                 }
-            });
+                Math.sin(random.nextDouble());
+            }
+            return null;
         }
-        executor.shutdown();
-        executor.awaitTermination(1, TimeUnit.DAYS);
+    });
+    executor.shutdown();
+    Sleep.sleep(500);
+    future.cancel(true);
+    executor.awaitTermination(1, TimeUnit.DAYS);
+    System.out.println("Finished..");
     }
 }
